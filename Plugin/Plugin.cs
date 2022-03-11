@@ -16,7 +16,7 @@ namespace LordAshes
         // Plugin info
         public const string Name = "Get In / Get Out Plug-In";         
         public const string Guid = "org.lordashes.plugins.getingetout";
-        public const string Version = "1.0.0.0";
+        public const string Version = "1.1.1.0";
 
         // Configuration
         Dictionary<CreatureGuid, string> locations = new Dictionary<CreatureGuid, string>();
@@ -45,18 +45,29 @@ namespace LordAshes
             foreach (CreatureBoardAsset asset in CreaturePresenter.AllCreatureAssets)
             {
                 if (!locations.ContainsKey(asset.Creature.CreatureId)) { locations.Add(asset.Creature.CreatureId, ""); }
-                Debug.Log("Creature " + StatMessaging.GetCreatureName(asset) + " at " + asset.CreatureRoot.transform.position.ToString() + " in " + locations[asset.Creature.CreatureId]);
+                Debug.Log("Get In / Get Out Plugin: Creature " + StatMessaging.GetCreatureName(asset) + " at " + asset.CreatureRoot.transform.position.ToString() + " was in " + locations[asset.Creature.CreatureId]);
                 bool foundLocation = false;
                 foreach (StateHideVolume hvs in hvss.Values)
                 {
-                    Debug.Log("Hide Volume "+hvs.Name+" Bounds "+hvs.Volume.HideVolume.Bounds.min.x+"->"+ hvs.Volume.HideVolume.Bounds.max.x+"," + hvs.Volume.HideVolume.Bounds.min.y + "->" + hvs.Volume.HideVolume.Bounds.max.y + "," + hvs.Volume.HideVolume.Bounds.min.z + "->" + hvs.Volume.HideVolume.Bounds.max.z);
-                    if (isInside(asset.CreatureRoot.position, hvs.Volume.HideVolume.Bounds))
+                    Debug.Log("Get In / Get Out Plugin: Hide Volume " + hvs.Name+" Bounds "+hvs.Volume.HideVolume.Bounds.min.x+"->"+ hvs.Volume.HideVolume.Bounds.max.x+"," + hvs.Volume.HideVolume.Bounds.min.y + "->" + hvs.Volume.HideVolume.Bounds.max.y + "," + hvs.Volume.HideVolume.Bounds.min.z + "->" + hvs.Volume.HideVolume.Bounds.max.z);
+                    if (isInside(asset.CreatureRoot.transform.position, hvs.Volume.HideVolume.Bounds))
                     {
+                        Debug.Log("Get In / Get Out Plugin: Creature Is In Now In Area "+ hvs.Name);
                         // Asset is inside this hide volume
                         foundLocation = true;
-                        if (locations[asset.Creature.CreatureId] != hvs.Name)
+                        if (locations[asset.Creature.CreatureId]=="" && locations[asset.Creature.CreatureId] != hvs.Name)
                         {
                             // Asset just moved into this hide volume
+                            locations[asset.Creature.CreatureId] = hvs.Name;
+                            StatMessaging.SetInfo(asset.Creature.CreatureId, "AssetLocation", hvs.Name);
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.Creature.CreatureId]);
+                        }
+                        else if (locations[asset.Creature.CreatureId] != "" && locations[asset.Creature.CreatureId] != hvs.Name)
+                        {
+                            // Asset just moved from hide volume into this hide volume
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has exited " + locations[asset.Creature.CreatureId]);
+                            locations[asset.Creature.CreatureId] = "";
+                            StatMessaging.ClearInfo(asset.Creature.CreatureId, "AssetLocation");
                             locations[asset.Creature.CreatureId] = hvs.Name;
                             StatMessaging.SetInfo(asset.Creature.CreatureId, "AssetLocation", hvs.Name);
                             Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.Creature.CreatureId]);
@@ -86,8 +97,8 @@ namespace LordAshes
         {
             if (pos.x < bounds.min.x) { return false; }
             if (pos.x > bounds.max.x) { return false; }
-            if (pos.y < bounds.min.y) { return false; }
-            if (pos.y > bounds.max.y) { return false; }
+            // if (pos.y < bounds.min.y) { return false; }
+            // if (pos.y > bounds.max.y) { return false; }
             if (pos.z < bounds.min.z) { return false; }
             if (pos.z > bounds.max.z) { return false; }
             return true;
