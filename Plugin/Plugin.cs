@@ -16,7 +16,7 @@ namespace LordAshes
         // Plugin info
         public const string Name = "Get In / Get Out Plug-In";         
         public const string Guid = "org.lordashes.plugins.getingetout";
-        public const string Version = "1.1.1.0";
+        public const string Version = "2.0.0.0";
 
         // Configuration
         Dictionary<CreatureGuid, string> locations = new Dictionary<CreatureGuid, string>();
@@ -44,37 +44,37 @@ namespace LordAshes
             Dictionary<NGuid,StateHideVolume> hvss = hvm.CurrentHideVolumeStates;
             foreach (CreatureBoardAsset asset in CreaturePresenter.AllCreatureAssets)
             {
-                if (!locations.ContainsKey(asset.Creature.CreatureId)) { locations.Add(asset.Creature.CreatureId, ""); }
-                Debug.Log("Get In / Get Out Plugin: Creature " + StatMessaging.GetCreatureName(asset) + " at " + asset.CreatureRoot.transform.position.ToString() + " was in " + locations[asset.Creature.CreatureId]);
+                if (!locations.ContainsKey(asset.CreatureId)) { locations.Add(asset.CreatureId, ""); }
+                Debug.Log("Get In / Get Out Plugin: Creature " + StatMessaging.GetCreatureName(asset) + " at " + Utility.GetRootObject(asset.CreatureId).transform.position.ToString() + " was in " + locations[asset.CreatureId]);
                 bool foundLocation = false;
                 foreach (StateHideVolume hvs in hvss.Values)
                 {
                     Debug.Log("Get In / Get Out Plugin: Hide Volume " + hvs.Name+" Bounds "+hvs.Volume.HideVolume.Bounds.min.x+"->"+ hvs.Volume.HideVolume.Bounds.max.x+"," + hvs.Volume.HideVolume.Bounds.min.y + "->" + hvs.Volume.HideVolume.Bounds.max.y + "," + hvs.Volume.HideVolume.Bounds.min.z + "->" + hvs.Volume.HideVolume.Bounds.max.z);
-                    if (isInside(asset.CreatureRoot.transform.position, hvs.Volume.HideVolume.Bounds))
+                    if (isInside(Utility.GetRootObject(asset.CreatureId).transform.position, hvs.Volume.HideVolume.Bounds))
                     {
                         Debug.Log("Get In / Get Out Plugin: Creature Is In Now In Area "+ hvs.Name);
                         // Asset is inside this hide volume
                         foundLocation = true;
-                        if (locations[asset.Creature.CreatureId]=="" && locations[asset.Creature.CreatureId] != hvs.Name)
+                        if (locations[asset.CreatureId]=="" && locations[asset.CreatureId] != hvs.Name)
                         {
                             // Asset just moved into this hide volume
-                            locations[asset.Creature.CreatureId] = hvs.Name;
-                            StatMessaging.SetInfo(asset.Creature.CreatureId, "AssetLocation", hvs.Name);
-                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.Creature.CreatureId]);
+                            locations[asset.CreatureId] = hvs.Name;
+                            StatMessaging.SetInfo(asset.CreatureId, "AssetLocation", hvs.Name);
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.CreatureId]);
                         }
-                        else if (locations[asset.Creature.CreatureId] != "" && locations[asset.Creature.CreatureId] != hvs.Name)
+                        else if (locations[asset.CreatureId] != "" && locations[asset.CreatureId] != hvs.Name)
                         {
                             // Asset just moved from hide volume into this hide volume
-                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has exited " + locations[asset.Creature.CreatureId]);
-                            locations[asset.Creature.CreatureId] = "";
-                            StatMessaging.ClearInfo(asset.Creature.CreatureId, "AssetLocation");
-                            locations[asset.Creature.CreatureId] = hvs.Name;
-                            StatMessaging.SetInfo(asset.Creature.CreatureId, "AssetLocation", hvs.Name);
-                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.Creature.CreatureId]);
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has exited " + locations[asset.CreatureId]);
+                            locations[asset.CreatureId] = "";
+                            StatMessaging.ClearInfo(asset.CreatureId, "AssetLocation");
+                            locations[asset.CreatureId] = hvs.Name;
+                            StatMessaging.SetInfo(asset.CreatureId, "AssetLocation", hvs.Name);
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has entered " + locations[asset.CreatureId]);
                         }
                         else
                         {
-                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " is still in " + locations[asset.Creature.CreatureId]);
+                            Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " is still in " + locations[asset.CreatureId]);
                         }
 
                     }
@@ -82,12 +82,12 @@ namespace LordAshes
                 }
                 if (!foundLocation)
                 {
-                    if (locations[asset.Creature.CreatureId] != "")
+                    if (locations[asset.CreatureId] != "")
                     {
                         // Asset is no longer in a hide volume
-                        Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has exited " + locations[asset.Creature.CreatureId]);
-                        locations[asset.Creature.CreatureId] = "";
-                        StatMessaging.ClearInfo(asset.Creature.CreatureId, "AssetLocation");
+                        Debug.Log("Get In / Get Out Plugin: " + StatMessaging.GetCreatureName(asset) + " has exited " + locations[asset.CreatureId]);
+                        locations[asset.CreatureId] = "";
+                        StatMessaging.ClearInfo(asset.CreatureId, "AssetLocation");
                     }
                 }
             }
