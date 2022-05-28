@@ -14,6 +14,7 @@ Video Demo: https://youtu.be/UbCBg2Nj3C0
 ## Change Log
 
 ```
+2.0.0: Fix for BR HF Integration update
 1.0.0: Initial release
 ```
 
