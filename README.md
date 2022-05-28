@@ -15,6 +15,8 @@ Video Demo: https://youtu.be/UbCBg2Nj3C0
 
 ```
 2.0.0: Fix for BR HF Integration update
+1.1.1: Refined logging messages and relaxed inside detection
+1.1.0: Moving from one area to directly to another, triggers exit and then entry
 1.0.0: Initial release
 ```
 
